@@ -2,7 +2,7 @@
 
 # --- imports ---
 import rospy
-#from simple_parking_maneuver.srv import *
+from simple_parking_maneuver.srv import *
 from std_msgs.msg import Float32
 from std_msgs.msg import String
 
