@@ -14,7 +14,10 @@ CAR_NUMBER = '10'
 
 x_position = 0
 y_position = 0
+steering_angle_power = 0
 steering_angle = 0
+ANGLE_PER_POWER = 0.200469279054956
+FORWARD_STEERING_MEAN = 330
 
 # norm_steering_left = NormalizedSteeringCommand()
 # norm_steering_left.value = STEERING
@@ -37,8 +40,11 @@ def position_update(data):
 	# rospy.loginfo('Position y is %f', data.pose.pose.position.y)
 
 def steering_angle_update(data):
+    global steering_angle_power
     global steering_angle
-    steering_angle = data.value
+    steering_angle_power = data.value
+    steering_angle = (steering_angle_power - FORWARD_STEERING_MEAN) * ANGLE_PER_POWER
+    rospy.loginfo('steering_angle is {}'.format(steering_angle))
 
 rospy.sleep(1.0)
 
@@ -78,7 +84,7 @@ positions = []
 steering_angles = []
 
 positions.append((x_position, y_position))
-steering_angles.append(steering_angle)
+steering_angles.append(steering_angle_power)
 
 drive_command = NormalizedSpeedCommand()
 drive_command.value = 0.33
@@ -87,7 +93,7 @@ stop_command = NormalizedSpeedCommand()
 stop_command.value = 0.0
 
 steering_cmd = NormalizedSteeringCommand()
-steering_cmd.value = -1.0
+steering_cmd.value = 0.0
 
 # publisher_steering.publish()
 
@@ -103,13 +109,13 @@ rospy.loginfo('pub_speed.publish({})'.format(drive_command.value))
 
 SLEEP_AT_WHEEL = 0.4
 positions.append((x_position, y_position))
-steering_angles.append(steering_angle)
+steering_angles.append(steering_angle_power)
 rospy.sleep(SLEEP_AT_WHEEL)
 positions.append((x_position, y_position))
-steering_angles.append(steering_angle)
+steering_angles.append(steering_angle_power)
 rospy.sleep(SLEEP_AT_WHEEL)
 positions.append((x_position, y_position))
-steering_angles.append(steering_angle)
+steering_angles.append(steering_angle_power)
 rospy.sleep(SLEEP_AT_WHEEL)
 
 # pub_speed.publish(drive_command)
@@ -120,7 +126,7 @@ rospy.loginfo('pub_speed.publish({})'.format(stop_command.value))
 rospy.sleep(0.5)
 
 positions.append((x_position, y_position))
-steering_angles.append(steering_angle)
+steering_angles.append(steering_angle_power)
 rospy.sleep(1.0)
 
 # pub_speed.publish(stop_command)
